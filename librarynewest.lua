@@ -2080,7 +2080,14 @@
             end
 
             function Keybind:SetVisibility(Bool)
-                Data.Parent.Instance.Visible = Bool
+                Items["KeyButton"].Instance.Visible = Bool
+                if not Bool then
+                    Items["Window"].Instance.Visible = false
+                end
+                if KeyListItem and KeyListItem.Instance then
+                    KeyListItem.Instance.Visible = Bool
+                end
+                Keybind.Visible = Bool
             end
 
             local Debounce = false
