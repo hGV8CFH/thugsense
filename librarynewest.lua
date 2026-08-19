@@ -1710,6 +1710,28 @@
                     Color = FromRGB(27, 27, 32)
                 }):AddToTheme({Color = "Outline"})
 
+                Items["HexHashtag"] = Instances:Create("TextLabel", {
+                    Parent = Items["HexBackground"].Instance,
+                    FontFace = Library.Font,
+                    TextColor3 = FromRGB(215, 215, 215),
+                    BorderColor3 = FromRGB(0, 0, 0),
+                    Text = "#",
+                    Name = "\0",
+                    Position = UDim2New(0, 5, 0, 0),
+                    Size = UDim2New(0, 9, 1, 0),
+                    BackgroundTransparency = 1,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    BorderSizePixel = 0,
+                    TextSize = 12,
+                    BackgroundColor3 = FromRGB(255, 255, 255)
+                })  Items["HexHashtag"]:AddToTheme({TextColor3 = "Text"})
+
+                Instances:Create("UIStroke", {
+                    Parent = Items["HexHashtag"].Instance,
+                    LineJoinMode = Enum.LineJoinMode.Miter,
+                    Name = "\0"
+                }):AddToTheme({Color = "Text Border"})
+
                 Items["HexInline"] = Instances:Create("TextBox", {
                     Parent = Items["HexBackground"].Instance,
                     FontFace = Library.Font,
@@ -1717,21 +1739,17 @@
                     BorderColor3 = FromRGB(0, 0, 0),
                     Text = "",
                     Name = "\0",
-                    Size = UDim2New(1, 0, 1, 0),
+                    Position = UDim2New(0, 14, 0, 0),
+                    Size = UDim2New(1, -16, 1, 0),
                     BorderSizePixel = 0,
                     ClearTextOnFocus = true,
                     BackgroundTransparency = 1,
                     PlaceholderColor3 = FromRGB(150, 150, 155),
                     TextXAlignment = Enum.TextXAlignment.Left,
-                    PlaceholderText = "#FFFFFF",
+                    PlaceholderText = "FFFFFF",
                     TextSize = 12,
                     BackgroundColor3 = FromRGB(255, 255, 255)
                 })  Items["HexInline"]:AddToTheme({TextColor3 = "Text"})
-
-                Instances:Create("UIPadding", {
-                    Parent = Items["HexInline"].Instance,
-                    PaddingLeft = UDimNew(0, 5)
-                })
 
                 Instances:Create("UIStroke", {
                     Parent = Items["HexInline"].Instance,
@@ -1754,7 +1772,7 @@
 
             local function ParseHex(hexStr)
                 if type(hexStr) ~= "string" then return nil, nil end
-                hexStr = string.gsub(hexStr, "[^%x]", "")
+                hexStr = string.gsub(hexStr, "[^0-9A-Fa-f]", "")
                 if #hexStr == 6 then
                     local r = tonumber(hexStr:sub(1, 2), 16)
                     local g = tonumber(hexStr:sub(3, 4), 16)
@@ -1781,18 +1799,6 @@
                 return nil, nil
             end
 
-            Items["HexInline"]:Connect("Focused", function()
-                isUpdatingHexText = true
-                Items["HexInline"].Instance.Text = "#"
-                Items["HexInline"].Instance.CursorPosition = 2
-                isUpdatingHexText = false
-                task.defer(function()
-                    if Items["HexInline"].Instance:IsFocused() then
-                        Items["HexInline"].Instance.CursorPosition = #Items["HexInline"].Instance.Text + 1
-                    end
-                end)
-            end)
-
             Items["HexInline"].Instance:GetPropertyChangedSignal("Text"):Connect(function()
                 if isUpdatingHexText then return end
                 local rawText = Items["HexInline"].Instance.Text
@@ -1802,11 +1808,11 @@
                 if #hexOnly > 6 then
                     hexOnly = string.sub(hexOnly, 1, 6)
                 end
-                local formatted = "#" .. hexOnly
-                isUpdatingHexText = true
-                Items["HexInline"].Instance.Text = formatted
-                Items["HexInline"].Instance.CursorPosition = #formatted + 1
-                isUpdatingHexText = false
+                if rawText ~= hexOnly then
+                    isUpdatingHexText = true
+                    Items["HexInline"].Instance.Text = hexOnly
+                    isUpdatingHexText = false
+                end
 
                 if #hexOnly == 6 then
                     local r = tonumber(hexOnly:sub(1, 2), 16)
@@ -1829,7 +1835,7 @@
                 end
                 isUpdatingHexText = true
                 Items["HexInline"].Instance.Text = ""
-                Items["HexInline"].Instance.PlaceholderText = "#" .. string.upper(Colorpicker.HexValue or "FFFFFF")
+                Items["HexInline"].Instance.PlaceholderText = string.upper(Colorpicker.HexValue or "FFFFFF")
                 isUpdatingHexText = false
             end)
 
@@ -1913,10 +1919,10 @@
                 if Items["HexInline"] and not isFromHexInput and not Items["HexInline"].Instance:IsFocused() then
                     isUpdatingHexText = true
                     Items["HexInline"].Instance.Text = ""
-                    Items["HexInline"].Instance.PlaceholderText = "#" .. string.upper(self.HexValue)
+                    Items["HexInline"].Instance.PlaceholderText = string.upper(self.HexValue)
                     isUpdatingHexText = false
                 elseif Items["HexInline"] then
-                    Items["HexInline"].Instance.PlaceholderText = "#" .. string.upper(self.HexValue)
+                    Items["HexInline"].Instance.PlaceholderText = string.upper(self.HexValue)
                 end
 
                 self:Update(nil, isFromHexInput)
@@ -1942,10 +1948,10 @@
                 if Items["HexInline"] and not isFromHexInput and not Items["HexInline"].Instance:IsFocused() then
                     isUpdatingHexText = true
                     Items["HexInline"].Instance.Text = ""
-                    Items["HexInline"].Instance.PlaceholderText = "#" .. string.upper(self.HexValue)
+                    Items["HexInline"].Instance.PlaceholderText = string.upper(self.HexValue)
                     isUpdatingHexText = false
                 elseif Items["HexInline"] then
-                    Items["HexInline"].Instance.PlaceholderText = "#" .. string.upper(self.HexValue)
+                    Items["HexInline"].Instance.PlaceholderText = string.upper(self.HexValue)
                 end
 
                 if Data.Callback then 
