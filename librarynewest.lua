@@ -1437,13 +1437,13 @@
                     Position = UDim2New(0, Data.Parent.Instance.AbsolutePosition.X, 0, Data.Parent.Instance.AbsolutePosition.Y + 15),
                     BorderColor3 = FromRGB(10, 10, 10),
                     Visible = false,
-                    Size = UDim2New(0, 238, 0, 224),
+                    Size = UDim2New(0, 238, 0, 252),
                     BorderSizePixel = 2,
                     BackgroundColor3 = FromRGB(15, 15, 20)
                 })  Items["ColorpickerWindow"]:AddToTheme({BackgroundColor3 = "Background"})
                 
                 Items["ColorpickerWindow"]:MakeDraggable()
-                Items["ColorpickerWindow"]:MakeResizeable(Vector2New(200, 180), Vector2New(9999, 9999))
+                Items["ColorpickerWindow"]:MakeResizeable(Vector2New(200, 220), Vector2New(9999, 9999))
 
                 Instances:Create("UIStroke", {
                     Parent = Items["ColorpickerWindow"].Instance,
@@ -1508,7 +1508,7 @@
                     AutoButtonColor = false,
                     Name = "\0",
                     Position = UDim2New(0, 0, 0, 15),
-                    Size = UDim2New(1, -26, 1, -40),
+                    Size = UDim2New(1, -26, 1, -66),
                     BorderSizePixel = 0,
                     TextSize = 14,
                     BackgroundColor3 = FromRGB(255, 0, 0)
@@ -1569,7 +1569,7 @@
                     Image = Library:GetImage("Hue"),
                     Name = "\0",
                     Position = UDim2New(1, 0, 0, 15),
-                    Size = UDim2New(0, 18, 1, -15),
+                    Size = UDim2New(0, 18, 1, -41),
                     BorderSizePixel = 0,
                     BackgroundColor3 = FromRGB(255, 255, 255)
                 }) 
@@ -1608,8 +1608,8 @@
                     AutoButtonColor = false,
                     AnchorPoint = Vector2New(0, 1),
                     Name = "\0",
-                    Position = UDim2New(0, 0, 1, 0),
-                    Size = UDim2New(1, -26, 0, 18),
+                    Position = UDim2New(0, 0, 1, -25),
+                    Size = UDim2New(1, -26, 0, 16),
                     BorderSizePixel = 0,
                     TextSize = 14,
                     BackgroundColor3 = FromRGB(255, 0, 0)
@@ -1661,6 +1661,131 @@
                     Name = "\0",
                     Color = FromRGB(27, 27, 32)
                 }):AddToTheme({Color = "Outline"})
+
+                -- Hex Input & Preview Row
+                Items["HexText"] = Instances:Create("TextLabel", {
+                    Parent = Items["ColorpickerWindow"].Instance,
+                    FontFace = Library.Font,
+                    TextColor3 = FromRGB(215, 215, 215),
+                    BorderColor3 = FromRGB(0, 0, 0),
+                    Text = "Hex",
+                    Name = "\0",
+                    AnchorPoint = Vector2New(0, 1),
+                    Position = UDim2New(0, 0, 1, 0),
+                    Size = UDim2New(0, 26, 0, 18),
+                    BackgroundTransparency = 1,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    BorderSizePixel = 0,
+                    TextSize = 12,
+                    BackgroundColor3 = FromRGB(255, 255, 255)
+                })  Items["HexText"]:AddToTheme({TextColor3 = "Text"})
+
+                Instances:Create("UIStroke", {
+                    Parent = Items["HexText"].Instance,
+                    LineJoinMode = Enum.LineJoinMode.Miter,
+                    Name = "\0"
+                }):AddToTheme({Color = "Text Border"})
+
+                Items["HexBackground"] = Instances:Create("Frame", {
+                    Parent = Items["ColorpickerWindow"].Instance,
+                    AnchorPoint = Vector2New(0, 1),
+                    Name = "\0",
+                    Position = UDim2New(0, 28, 1, 0),
+                    BorderColor3 = FromRGB(10, 10, 10),
+                    Size = UDim2New(1, -54, 0, 18),
+                    BorderSizePixel = 2,
+                    BackgroundColor3 = FromRGB(33, 33, 36)
+                })  Items["HexBackground"]:AddToTheme({BackgroundColor3 = "Element", BorderColor3 = "Border"})
+
+                Instances:Create("UIGradient", {
+                    Parent = Items["HexBackground"].Instance,
+                    Rotation = 90,
+                    Color = RGBSequence{RGBSequenceKeypoint(0, FromRGB(255, 255, 255)), RGBSequenceKeypoint(1, FromRGB(100, 100, 100))}
+                })
+
+                Instances:Create("UIStroke", {
+                    Parent = Items["HexBackground"].Instance,
+                    ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+                    LineJoinMode = Enum.LineJoinMode.Miter,
+                    Name = "\0",
+                    Color = FromRGB(27, 27, 32)
+                }):AddToTheme({Color = "Outline"})
+
+                Items["HexInline"] = Instances:Create("TextBox", {
+                    Parent = Items["HexBackground"].Instance,
+                    FontFace = Library.Font,
+                    TextColor3 = FromRGB(215, 215, 215),
+                    BorderColor3 = FromRGB(0, 0, 0),
+                    Text = "#FFFFFF",
+                    Name = "\0",
+                    Size = UDim2New(1, 0, 1, 0),
+                    BorderSizePixel = 0,
+                    ClearTextOnFocus = false,
+                    BackgroundTransparency = 1,
+                    PlaceholderColor3 = FromRGB(178, 178, 178),
+                    TextXAlignment = Enum.TextXAlignment.Center,
+                    PlaceholderText = "#FFFFFF",
+                    TextSize = 11,
+                    BackgroundColor3 = FromRGB(255, 255, 255)
+                })  Items["HexInline"]:AddToTheme({TextColor3 = "Text"})
+
+                Instances:Create("UIStroke", {
+                    Parent = Items["HexInline"].Instance,
+                    LineJoinMode = Enum.LineJoinMode.Miter,
+                    Name = "\0"
+                }):AddToTheme({Color = "Text Border"})
+
+                Items["HexBackground"]:OnHover(function()
+                    Items["HexBackground"]:Tween(nil, {BackgroundColor3 = Library.Theme["Hovered Element"]})
+                    Items["HexBackground"]:ChangeItemTheme({BackgroundColor3 = "Hovered Element", BorderColor3 = "Border"})
+                end)
+
+                -- Preview Box
+                Items["HexPreviewHolder"] = Instances:Create("Frame", {
+                    Parent = Items["ColorpickerWindow"].Instance,
+                    AnchorPoint = Vector2New(1, 1),
+                    Name = "\0",
+                    Position = UDim2New(1, 0, 1, 0),
+                    BorderColor3 = FromRGB(10, 10, 10),
+                    Size = UDim2New(0, 20, 0, 18),
+                    BorderSizePixel = 2,
+                    BackgroundColor3 = FromRGB(33, 33, 36)
+                })  Items["HexPreviewHolder"]:AddToTheme({BorderColor3 = "Border"})
+
+                Instances:Create("UIStroke", {
+                    Parent = Items["HexPreviewHolder"].Instance,
+                    ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+                    LineJoinMode = Enum.LineJoinMode.Miter,
+                    Name = "\0",
+                    Color = FromRGB(27, 27, 32)
+                }):AddToTheme({Color = "Outline"})
+
+                Items["HexPreviewCheckers"] = Instances:Create("ImageLabel", {
+                    Parent = Items["HexPreviewHolder"].Instance,
+                    ScaleType = Enum.ScaleType.Tile,
+                    BorderColor3 = FromRGB(0, 0, 0),
+                    Image = Library:GetImage("Checkers"),
+                    TileSize = UDim2New(0, 6, 0, 6),
+                    Name = "\0",
+                    Size = UDim2New(1, 0, 1, 0),
+                    BorderSizePixel = 0,
+                    BackgroundColor3 = FromRGB(255, 255, 255)
+                })
+
+                Items["HexPreview"] = Instances:Create("Frame", {
+                    Parent = Items["HexPreviewHolder"].Instance,
+                    Name = "\0",
+                    BorderColor3 = FromRGB(0, 0, 0),
+                    Size = UDim2New(1, 0, 1, 0),
+                    BorderSizePixel = 0,
+                    BackgroundColor3 = FromRGB(255, 255, 255)
+                })
+
+                Instances:Create("UIGradient", {
+                    Parent = Items["HexPreview"].Instance,
+                    Rotation = 90,
+                    Color = RGBSequence{RGBSequenceKeypoint(0, FromRGB(255, 255, 255)), RGBSequenceKeypoint(1, FromRGB(100, 100, 100))}
+                })
             end
 
             local SlidingPalette = false
@@ -1668,6 +1793,45 @@
             local SlidingAlpha = false
 
             local Debounce = false
+
+            local function ParseHex(hexStr)
+                if type(hexStr) ~= "string" then return nil, nil end
+                hexStr = string.gsub(hexStr, "[^%x]", "")
+                if #hexStr == 6 then
+                    local r = tonumber(hexStr:sub(1, 2), 16)
+                    local g = tonumber(hexStr:sub(3, 4), 16)
+                    local b = tonumber(hexStr:sub(5, 6), 16)
+                    if r and g and b then
+                        return FromRGB(r, g, b), nil
+                    end
+                elseif #hexStr == 8 then
+                    local r = tonumber(hexStr:sub(1, 2), 16)
+                    local g = tonumber(hexStr:sub(3, 4), 16)
+                    local b = tonumber(hexStr:sub(5, 6), 16)
+                    local a = tonumber(hexStr:sub(7, 8), 16)
+                    if r and g and b and a then
+                        return FromRGB(r, g, b), a / 255
+                    end
+                elseif #hexStr == 3 then
+                    local r = tonumber(hexStr:sub(1, 1):rep(2), 16)
+                    local g = tonumber(hexStr:sub(2, 2):rep(2), 16)
+                    local b = tonumber(hexStr:sub(3, 3):rep(2), 16)
+                    if r and g and b then
+                        return FromRGB(r, g, b), nil
+                    end
+                end
+                return nil, nil
+            end
+
+            Items["HexInline"]:Connect("FocusLost", function(EnterPressed)
+                local Text = Items["HexInline"].Instance.Text
+                local ParsedColor, ParsedAlpha = ParseHex(Text)
+                if ParsedColor then
+                    Colorpicker:Set(ParsedColor, ParsedAlpha or Colorpicker.Alpha)
+                else
+                    Items["HexInline"].Instance.Text = "#" .. string.upper(Colorpicker.HexValue or "FFFFFF")
+                end
+            end)
 
             function Colorpicker:SetOpen(Bool)
                 if Debounce then 
@@ -1707,7 +1871,18 @@
                     Alpha = Color[4]
                     Color = FromRGB(Color[1], Color[2], Color[3])
                 elseif type(Color) == "string" then 
-                    Color = FromHex(Color)
+                    local parsedC, parsedA = ParseHex(Color)
+                    if parsedC then
+                        Color = parsedC
+                        if parsedA then Alpha = parsedA end
+                    else
+                        local ok, res = pcall(FromHex, Color)
+                        if ok and res then
+                            Color = res
+                        else
+                            Color = FromRGB(255, 255, 255)
+                        end
+                    end
                 end
 
                 self.Hue, self.Saturation, self.Value = Color:ToHSV()
@@ -1735,6 +1910,15 @@
 
                 Items["AlphaDragger"]:Tween(TweenInfo.new(0.17, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Position = UDim2New(AlphaPositionX, 0, 0, 0)})
 
+                if Items["HexInline"] and not Items["HexInline"].Instance:IsFocused() then
+                    Items["HexInline"].Instance.Text = "#" .. string.upper(self.HexValue)
+                end
+
+                if Items["HexPreview"] then
+                    Items["HexPreview"].Instance.BackgroundColor3 = self.Color
+                    Items["HexPreview"].Instance.BackgroundTransparency = self.Alpha
+                end
+
                 self:Update()
             end
 
@@ -1753,6 +1937,15 @@
 
                 if not IsFromAlpha then 
                     Items["Alpha"]:Tween(TweenInfo.new(0.17, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {BackgroundColor3 = self.Color})
+                end
+
+                if Items["HexInline"] and not Items["HexInline"].Instance:IsFocused() then
+                    Items["HexInline"].Instance.Text = "#" .. string.upper(self.HexValue)
+                end
+
+                if Items["HexPreview"] then
+                    Items["HexPreview"].Instance.BackgroundColor3 = self.Color
+                    Items["HexPreview"].Instance.BackgroundTransparency = self.Alpha
                 end
 
                 if Data.Callback then 
