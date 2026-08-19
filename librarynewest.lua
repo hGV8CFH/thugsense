@@ -1781,19 +1781,27 @@
                 return nil, nil
             end
 
+            Items["HexInline"]:Connect("Focused", function()
+                isUpdatingHexText = true
+                Items["HexInline"].Instance.Text = "#"
+                isUpdatingHexText = false
+            end)
+
             Items["HexInline"].Instance:GetPropertyChangedSignal("Text"):Connect(function()
                 if isUpdatingHexText then return end
                 local rawText = Items["HexInline"].Instance.Text
                 if rawText == "" then return end
 
-                isUpdatingHexText = true
-                local hexOnly = string.gsub(rawText, "[^%x]", ""):upper()
+                local hexOnly = string.gsub(rawText, "[^0-9A-Fa-f]", ""):upper()
                 if #hexOnly > 6 then
                     hexOnly = string.sub(hexOnly, 1, 6)
                 end
                 local formatted = "#" .. hexOnly
-                Items["HexInline"].Instance.Text = formatted
-                isUpdatingHexText = false
+                if rawText ~= formatted then
+                    isUpdatingHexText = true
+                    Items["HexInline"].Instance.Text = formatted
+                    isUpdatingHexText = false
+                end
 
                 if #hexOnly == 6 then
                     local r = tonumber(hexOnly:sub(1, 2), 16)
@@ -1807,7 +1815,7 @@
 
             Items["HexInline"]:Connect("FocusLost", function(EnterPressed)
                 local rawText = Items["HexInline"].Instance.Text
-                local hexOnly = string.gsub(rawText, "[^%x]", ""):upper()
+                local hexOnly = string.gsub(rawText, "[^0-9A-Fa-f]", ""):upper()
                 if #hexOnly == 6 or #hexOnly == 3 then
                     local parsedC = ParseHex(hexOnly)
                     if parsedC then
