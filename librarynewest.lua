@@ -1784,7 +1784,13 @@
             Items["HexInline"]:Connect("Focused", function()
                 isUpdatingHexText = true
                 Items["HexInline"].Instance.Text = "#"
+                Items["HexInline"].Instance.CursorPosition = 2
                 isUpdatingHexText = false
+                task.defer(function()
+                    if Items["HexInline"].Instance:IsFocused() then
+                        Items["HexInline"].Instance.CursorPosition = #Items["HexInline"].Instance.Text + 1
+                    end
+                end)
             end)
 
             Items["HexInline"].Instance:GetPropertyChangedSignal("Text"):Connect(function()
@@ -1797,11 +1803,10 @@
                     hexOnly = string.sub(hexOnly, 1, 6)
                 end
                 local formatted = "#" .. hexOnly
-                if rawText ~= formatted then
-                    isUpdatingHexText = true
-                    Items["HexInline"].Instance.Text = formatted
-                    isUpdatingHexText = false
-                end
+                isUpdatingHexText = true
+                Items["HexInline"].Instance.Text = formatted
+                Items["HexInline"].Instance.CursorPosition = #formatted + 1
+                isUpdatingHexText = false
 
                 if #hexOnly == 6 then
                     local r = tonumber(hexOnly:sub(1, 2), 16)
