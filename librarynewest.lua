@@ -1662,7 +1662,6 @@
                     Color = FromRGB(27, 27, 32)
                 }):AddToTheme({Color = "Outline"})
 
-                -- Hex Input & Preview Row
                 Items["HexText"] = Instances:Create("TextLabel", {
                     Parent = Items["ColorpickerWindow"].Instance,
                     FontFace = Library.Font,
@@ -1692,7 +1691,7 @@
                     Name = "\0",
                     Position = UDim2New(0, 28, 1, 0),
                     BorderColor3 = FromRGB(10, 10, 10),
-                    Size = UDim2New(1, -54, 0, 18),
+                    Size = UDim2New(1, -28, 0, 18),
                     BorderSizePixel = 2,
                     BackgroundColor3 = FromRGB(33, 33, 36)
                 })  Items["HexBackground"]:AddToTheme({BackgroundColor3 = "Element", BorderColor3 = "Border"})
@@ -1716,18 +1715,23 @@
                     FontFace = Library.Font,
                     TextColor3 = FromRGB(215, 215, 215),
                     BorderColor3 = FromRGB(0, 0, 0),
-                    Text = "#FFFFFF",
+                    Text = "",
                     Name = "\0",
                     Size = UDim2New(1, 0, 1, 0),
                     BorderSizePixel = 0,
-                    ClearTextOnFocus = false,
+                    ClearTextOnFocus = true,
                     BackgroundTransparency = 1,
-                    PlaceholderColor3 = FromRGB(178, 178, 178),
-                    TextXAlignment = Enum.TextXAlignment.Center,
+                    PlaceholderColor3 = FromRGB(150, 150, 155),
+                    TextXAlignment = Enum.TextXAlignment.Left,
                     PlaceholderText = "#FFFFFF",
-                    TextSize = 11,
+                    TextSize = 12,
                     BackgroundColor3 = FromRGB(255, 255, 255)
                 })  Items["HexInline"]:AddToTheme({TextColor3 = "Text"})
+
+                Instances:Create("UIPadding", {
+                    Parent = Items["HexInline"].Instance,
+                    PaddingLeft = UDimNew(0, 5)
+                })
 
                 Instances:Create("UIStroke", {
                     Parent = Items["HexInline"].Instance,
@@ -1739,53 +1743,6 @@
                     Items["HexBackground"]:Tween(nil, {BackgroundColor3 = Library.Theme["Hovered Element"]})
                     Items["HexBackground"]:ChangeItemTheme({BackgroundColor3 = "Hovered Element", BorderColor3 = "Border"})
                 end)
-
-                -- Preview Box
-                Items["HexPreviewHolder"] = Instances:Create("Frame", {
-                    Parent = Items["ColorpickerWindow"].Instance,
-                    AnchorPoint = Vector2New(1, 1),
-                    Name = "\0",
-                    Position = UDim2New(1, 0, 1, 0),
-                    BorderColor3 = FromRGB(10, 10, 10),
-                    Size = UDim2New(0, 20, 0, 18),
-                    BorderSizePixel = 2,
-                    BackgroundColor3 = FromRGB(33, 33, 36)
-                })  Items["HexPreviewHolder"]:AddToTheme({BorderColor3 = "Border"})
-
-                Instances:Create("UIStroke", {
-                    Parent = Items["HexPreviewHolder"].Instance,
-                    ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-                    LineJoinMode = Enum.LineJoinMode.Miter,
-                    Name = "\0",
-                    Color = FromRGB(27, 27, 32)
-                }):AddToTheme({Color = "Outline"})
-
-                Items["HexPreviewCheckers"] = Instances:Create("ImageLabel", {
-                    Parent = Items["HexPreviewHolder"].Instance,
-                    ScaleType = Enum.ScaleType.Tile,
-                    BorderColor3 = FromRGB(0, 0, 0),
-                    Image = Library:GetImage("Checkers"),
-                    TileSize = UDim2New(0, 6, 0, 6),
-                    Name = "\0",
-                    Size = UDim2New(1, 0, 1, 0),
-                    BorderSizePixel = 0,
-                    BackgroundColor3 = FromRGB(255, 255, 255)
-                })
-
-                Items["HexPreview"] = Instances:Create("Frame", {
-                    Parent = Items["HexPreviewHolder"].Instance,
-                    Name = "\0",
-                    BorderColor3 = FromRGB(0, 0, 0),
-                    Size = UDim2New(1, 0, 1, 0),
-                    BorderSizePixel = 0,
-                    BackgroundColor3 = FromRGB(255, 255, 255)
-                })
-
-                Instances:Create("UIGradient", {
-                    Parent = Items["HexPreview"].Instance,
-                    Rotation = 90,
-                    Color = RGBSequence{RGBSequenceKeypoint(0, FromRGB(255, 255, 255)), RGBSequenceKeypoint(1, FromRGB(100, 100, 100))}
-                })
             end
 
             local SlidingPalette = false
@@ -1793,6 +1750,7 @@
             local SlidingAlpha = false
 
             local Debounce = false
+            local isUpdatingHexText = false
 
             local function ParseHex(hexStr)
                 if type(hexStr) ~= "string" then return nil, nil end
@@ -1823,14 +1781,43 @@
                 return nil, nil
             end
 
-            Items["HexInline"]:Connect("FocusLost", function(EnterPressed)
-                local Text = Items["HexInline"].Instance.Text
-                local ParsedColor, ParsedAlpha = ParseHex(Text)
-                if ParsedColor then
-                    Colorpicker:Set(ParsedColor, ParsedAlpha or Colorpicker.Alpha)
-                else
-                    Items["HexInline"].Instance.Text = "#" .. string.upper(Colorpicker.HexValue or "FFFFFF")
+            Items["HexInline"].Instance:GetPropertyChangedSignal("Text"):Connect(function()
+                if isUpdatingHexText then return end
+                local rawText = Items["HexInline"].Instance.Text
+                if rawText == "" then return end
+
+                isUpdatingHexText = true
+                local hexOnly = string.gsub(rawText, "[^%x]", ""):upper()
+                if #hexOnly > 6 then
+                    hexOnly = string.sub(hexOnly, 1, 6)
                 end
+                local formatted = "#" .. hexOnly
+                Items["HexInline"].Instance.Text = formatted
+                isUpdatingHexText = false
+
+                if #hexOnly == 6 then
+                    local r = tonumber(hexOnly:sub(1, 2), 16)
+                    local g = tonumber(hexOnly:sub(3, 4), 16)
+                    local b = tonumber(hexOnly:sub(5, 6), 16)
+                    if r and g and b then
+                        Colorpicker:Set(FromRGB(r, g, b), Colorpicker.Alpha, true)
+                    end
+                end
+            end)
+
+            Items["HexInline"]:Connect("FocusLost", function(EnterPressed)
+                local rawText = Items["HexInline"].Instance.Text
+                local hexOnly = string.gsub(rawText, "[^%x]", ""):upper()
+                if #hexOnly == 6 or #hexOnly == 3 then
+                    local parsedC = ParseHex(hexOnly)
+                    if parsedC then
+                        Colorpicker:Set(parsedC, Colorpicker.Alpha, true)
+                    end
+                end
+                isUpdatingHexText = true
+                Items["HexInline"].Instance.Text = ""
+                Items["HexInline"].Instance.PlaceholderText = "#" .. string.upper(Colorpicker.HexValue or "FFFFFF")
+                isUpdatingHexText = false
             end)
 
             function Colorpicker:SetOpen(Bool)
@@ -1866,7 +1853,7 @@
             Data.Parent.Instance.Visible = Bool 
             end
 
-            function Colorpicker:Set(Color, Alpha)
+            function Colorpicker:Set(Color, Alpha, isFromHexInput)
                 if type(Color) == "table" then 
                     Alpha = Color[4]
                     Color = FromRGB(Color[1], Color[2], Color[3])
@@ -1886,7 +1873,7 @@
                 end
 
                 self.Hue, self.Saturation, self.Value = Color:ToHSV()
-                self.Alpha = Alpha or 0
+                self.Alpha = Alpha or self.Alpha or 0
 
                 self.Color = FromHSV(self.Hue, self.Saturation, self.Value)
                 self.HexValue = self.Color:ToHex()
@@ -1910,19 +1897,19 @@
 
                 Items["AlphaDragger"]:Tween(TweenInfo.new(0.17, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Position = UDim2New(AlphaPositionX, 0, 0, 0)})
 
-                if Items["HexInline"] and not Items["HexInline"].Instance:IsFocused() then
-                    Items["HexInline"].Instance.Text = "#" .. string.upper(self.HexValue)
+                if Items["HexInline"] and not isFromHexInput and not Items["HexInline"].Instance:IsFocused() then
+                    isUpdatingHexText = true
+                    Items["HexInline"].Instance.Text = ""
+                    Items["HexInline"].Instance.PlaceholderText = "#" .. string.upper(self.HexValue)
+                    isUpdatingHexText = false
+                elseif Items["HexInline"] then
+                    Items["HexInline"].Instance.PlaceholderText = "#" .. string.upper(self.HexValue)
                 end
 
-                if Items["HexPreview"] then
-                    Items["HexPreview"].Instance.BackgroundColor3 = self.Color
-                    Items["HexPreview"].Instance.BackgroundTransparency = self.Alpha
-                end
-
-                self:Update()
+                self:Update(nil, isFromHexInput)
             end
 
-            function Colorpicker:Update(IsFromAlpha)
+            function Colorpicker:Update(IsFromAlpha, isFromHexInput)
                 self.Color = FromHSV(self.Hue, self.Saturation, self.Value)
                 self.HexValue = self.Color:ToHex()
 
@@ -1939,13 +1926,13 @@
                     Items["Alpha"]:Tween(TweenInfo.new(0.17, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {BackgroundColor3 = self.Color})
                 end
 
-                if Items["HexInline"] and not Items["HexInline"].Instance:IsFocused() then
-                    Items["HexInline"].Instance.Text = "#" .. string.upper(self.HexValue)
-                end
-
-                if Items["HexPreview"] then
-                    Items["HexPreview"].Instance.BackgroundColor3 = self.Color
-                    Items["HexPreview"].Instance.BackgroundTransparency = self.Alpha
+                if Items["HexInline"] and not isFromHexInput and not Items["HexInline"].Instance:IsFocused() then
+                    isUpdatingHexText = true
+                    Items["HexInline"].Instance.Text = ""
+                    Items["HexInline"].Instance.PlaceholderText = "#" .. string.upper(self.HexValue)
+                    isUpdatingHexText = false
+                elseif Items["HexInline"] then
+                    Items["HexInline"].Instance.PlaceholderText = "#" .. string.upper(self.HexValue)
                 end
 
                 if Data.Callback then 
