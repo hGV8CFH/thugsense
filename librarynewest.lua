@@ -1278,22 +1278,32 @@
         end
 
         Library.ConfirmDialog = function(self, Title, Message, OnConfirm, OnCancel)
+            local dialogGui = InstanceNew("ScreenGui")
+            dialogGui.Name = "\0"
+            dialogGui.ResetOnSpawn = false
+            dialogGui.DisplayOrder = 999
+            dialogGui.IgnoreGuiInset = true
+            dialogGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+            dialogGui.Parent = gethui()
+
+            local snowParticles = {}
+            local snowRunning = true
+
+            local overlay = InstanceNew("TextButton")
+            overlay.Name = "\0"
+            overlay.Text = ""
+            overlay.AutoButtonColor = false
+            overlay.Size = UDim2New(1, 0, 1, 0)
+            overlay.BackgroundColor3 = FromRGB(0, 0, 0)
+            overlay.BackgroundTransparency = 1
+            overlay.BorderSizePixel = 0
+            overlay.ZIndex = 50000
+            overlay.Parent = dialogGui
+
             local Items = { }
 
-            Items["Overlay"] = Instances:Create("TextButton", {
-                Parent = Library.Holder.Instance,
-                Name = "\0",
-                Text = "",
-                AutoButtonColor = false,
-                Size = UDim2New(1, 0, 1, 0),
-                BackgroundColor3 = FromRGB(0, 0, 0),
-                BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-                ZIndex = 999
-            })
-
             Items["Dialog"] = Instances:Create("Frame", {
-                Parent = Library.Holder.Instance,
+                Parent = dialogGui,
                 Name = "\0",
                 AnchorPoint = Vector2New(0.5, 0.5),
                 Position = UDim2New(0.5, 0, 0.5, 0),
@@ -1302,7 +1312,7 @@
                 BorderSizePixel = 2,
                 BackgroundColor3 = FromRGB(18, 18, 23),
                 BackgroundTransparency = 1,
-                ZIndex = 1000
+                ZIndex = 50100
             })  Items["Dialog"]:AddToTheme({BackgroundColor3 = "Background", BorderColor3 = "Border"})
 
             Instances:Create("UIStroke", {
@@ -1320,9 +1330,9 @@
                 Position = UDim2New(0, 0, 0, -1),
                 Size = UDim2New(1, 0, 0, 2),
                 BorderSizePixel = 0,
-                BackgroundColor3 = FromRGB(255, 170, 50),
+                BackgroundColor3 = FromRGB(185, 208, 250),
                 BackgroundTransparency = 1,
-                ZIndex = 1001
+                ZIndex = 50101
             })
 
             Instances:Create("UIGradient", {
@@ -1344,7 +1354,7 @@
                 Size = UDim2New(1, -16, 0, 16),
                 BorderSizePixel = 0,
                 TextSize = 13,
-                ZIndex = 1001,
+                ZIndex = 50101,
                 BackgroundColor3 = FromRGB(255, 255, 255)
             })
 
@@ -1362,7 +1372,7 @@
                 BorderSizePixel = 0,
                 BackgroundColor3 = FromRGB(40, 40, 45),
                 BackgroundTransparency = 1,
-                ZIndex = 1001
+                ZIndex = 50101
             })
 
             Items["Message"] = Instances:Create("TextLabel", {
@@ -1379,7 +1389,7 @@
                 Size = UDim2New(1, -16, 0, 36),
                 BorderSizePixel = 0,
                 TextSize = 12,
-                ZIndex = 1001,
+                ZIndex = 50101,
                 BackgroundColor3 = FromRGB(255, 255, 255)
             })  Items["Message"]:AddToTheme({TextColor3 = "Text"})
 
@@ -1396,14 +1406,15 @@
                 Position = UDim2New(0, 8, 1, -32),
                 Size = UDim2New(1, -16, 0, 24),
                 BorderSizePixel = 0,
-                ZIndex = 1001,
+                ZIndex = 50101,
                 BackgroundColor3 = FromRGB(18, 18, 23)
             })
 
             local function closeDialog()
                 pcall(function()
-                    local tweenInfo = TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-                    TweenService:Create(Items["Overlay"].Instance, tweenInfo, {BackgroundTransparency = 1}):Play()
+                    snowRunning = false
+                    local tweenInfo = TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+                    TweenService:Create(overlay, tweenInfo, {BackgroundTransparency = 1}):Play()
                     TweenService:Create(Items["Dialog"].Instance, tweenInfo, {BackgroundTransparency = 1}):Play()
                     for _, desc in Items["Dialog"].Instance:GetDescendants() do
                         if desc:IsA("UIStroke") then
@@ -1414,9 +1425,13 @@
                             TweenService:Create(desc, tweenInfo, {BackgroundTransparency = 1}):Play()
                         end
                     end
-                    task.wait(0.2)
-                    Items["Dialog"]:Clean()
-                    Items["Overlay"]:Clean()
+                    for _, p in snowParticles do
+                        pcall(function()
+                            TweenService:Create(p, tweenInfo, {BackgroundTransparency = 1}):Play()
+                        end)
+                    end
+                    task.wait(0.3)
+                    dialogGui:Destroy()
                 end)
             end
 
@@ -1431,7 +1446,7 @@
                 BorderSizePixel = 2,
                 BackgroundColor3 = FromRGB(40, 65, 40),
                 BackgroundTransparency = 1,
-                ZIndex = 1002
+                ZIndex = 50102
             })
 
             Instances:Create("UIGradient", {
@@ -1460,7 +1475,7 @@
                 Position = UDim2New(0, 0, 0, -1),
                 BorderSizePixel = 0,
                 TextSize = 12,
-                ZIndex = 1003,
+                ZIndex = 50103,
                 BackgroundColor3 = FromRGB(255, 255, 255)
             })
 
@@ -1481,7 +1496,7 @@
                 BorderSizePixel = 2,
                 BackgroundColor3 = FromRGB(65, 35, 35),
                 BackgroundTransparency = 1,
-                ZIndex = 1002
+                ZIndex = 50102
             })
 
             Instances:Create("UIGradient", {
@@ -1510,7 +1525,7 @@
                 Position = UDim2New(0, 0, 0, -1),
                 BorderSizePixel = 0,
                 TextSize = 12,
-                ZIndex = 1003,
+                ZIndex = 50103,
                 BackgroundColor3 = FromRGB(255, 255, 255)
             })
 
@@ -1557,9 +1572,47 @@
                 end
             end
 
+            local function spawnSnowflake()
+                local size = math.random(2, 5)
+                local startX = math.random(0, 100) / 100
+                local drift = (math.random(-15, 15)) / 100
+                local duration = math.random(20, 40) / 10
+                local alpha = math.random(3, 7) / 10
+
+                local flake = InstanceNew("Frame")
+                flake.Name = "\0"
+                flake.Size = UDim2New(0, size, 0, size)
+                flake.Position = UDim2New(startX, 0, -0.02, 0)
+                flake.BackgroundColor3 = FromRGB(
+                    math.random(160, 200),
+                    math.random(200, 225),
+                    math.random(235, 255)
+                )
+                flake.BackgroundTransparency = 1 - alpha
+                flake.BorderSizePixel = 0
+                flake.ZIndex = 50001
+                flake.Parent = overlay
+
+                local corner = InstanceNew("UICorner")
+                corner.CornerRadius = UDimNew(1, 0)
+                corner.Parent = flake
+
+                table.insert(snowParticles, flake)
+
+                local endX = startX + drift
+                TweenService:Create(flake, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
+                    Position = UDim2New(endX, 0, 1.05, 0),
+                    BackgroundTransparency = 0.85
+                }):Play()
+
+                task.delay(duration, function()
+                    pcall(function() flake:Destroy() end)
+                end)
+            end
+
             Library:Thread(function()
-                local tweenInfo = TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-                TweenService:Create(Items["Overlay"].Instance, tweenInfo, {BackgroundTransparency = 0.5}):Play()
+                local tweenInfo = TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+                TweenService:Create(overlay, tweenInfo, {BackgroundTransparency = 0.4}):Play()
                 TweenService:Create(Items["Dialog"].Instance, tweenInfo, {BackgroundTransparency = 0}):Play()
                 for _, desc in Items["Dialog"].Instance:GetDescendants() do
                     if desc == Items["ButtonContainer"].Instance then continue end
@@ -1570,6 +1623,16 @@
                     elseif desc:IsA("Frame") or desc:IsA("TextButton") then
                         TweenService:Create(desc, tweenInfo, {BackgroundTransparency = 0}):Play()
                     end
+                end
+
+                for i = 1, 8 do
+                    spawnSnowflake()
+                end
+
+                while snowRunning do
+                    task.wait(math.random(8, 20) / 100)
+                    if not snowRunning then break end
+                    spawnSnowflake()
                 end
             end)
         end
