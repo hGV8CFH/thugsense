@@ -1287,7 +1287,7 @@
                 AutoButtonColor = false,
                 Size = UDim2New(1, 0, 1, 0),
                 BackgroundColor3 = FromRGB(0, 0, 0),
-                BackgroundTransparency = 0.5,
+                BackgroundTransparency = 1,
                 BorderSizePixel = 0,
                 ZIndex = 999
             })
@@ -1301,6 +1301,7 @@
                 BorderColor3 = FromRGB(10, 10, 10),
                 BorderSizePixel = 2,
                 BackgroundColor3 = FromRGB(18, 18, 23),
+                BackgroundTransparency = 1,
                 ZIndex = 1000
             })  Items["Dialog"]:AddToTheme({BackgroundColor3 = "Background", BorderColor3 = "Border"})
 
@@ -1320,6 +1321,7 @@
                 Size = UDim2New(1, 0, 0, 2),
                 BorderSizePixel = 0,
                 BackgroundColor3 = FromRGB(255, 170, 50),
+                BackgroundTransparency = 1,
                 ZIndex = 1001
             })
 
@@ -1329,32 +1331,17 @@
                 Color = RGBSequence{RGBSequenceKeypoint(0, FromRGB(255, 255, 255)), RGBSequenceKeypoint(1, FromRGB(65, 65, 65))}
             })
 
-            Items["WarningIcon"] = Instances:Create("TextLabel", {
-                Parent = Items["Dialog"].Instance,
-                FontFace = Library.Font,
-                TextColor3 = FromRGB(255, 170, 50),
-                Text = "⚠",
-                Name = "\0",
-                BackgroundTransparency = 1,
-                Position = UDim2New(0, 8, 0, 6),
-                Size = UDim2New(0, 16, 0, 16),
-                BorderSizePixel = 0,
-                TextSize = 14,
-                TextXAlignment = Enum.TextXAlignment.Center,
-                ZIndex = 1001,
-                BackgroundColor3 = FromRGB(255, 255, 255)
-            })
-
             Items["Title"] = Instances:Create("TextLabel", {
                 Parent = Items["Dialog"].Instance,
                 FontFace = Library.Font,
                 TextColor3 = FromRGB(255, 170, 50),
-                Text = Title or "Warning",
+                Text = Title or "WARNING",
                 Name = "\0",
                 BackgroundTransparency = 1,
+                TextTransparency = 1,
                 TextXAlignment = Enum.TextXAlignment.Left,
-                Position = UDim2New(0, 26, 0, 6),
-                Size = UDim2New(1, -34, 0, 16),
+                Position = UDim2New(0, 8, 0, 6),
+                Size = UDim2New(1, -16, 0, 16),
                 BorderSizePixel = 0,
                 TextSize = 13,
                 ZIndex = 1001,
@@ -1374,6 +1361,7 @@
                 Size = UDim2New(1, -8, 0, 1),
                 BorderSizePixel = 0,
                 BackgroundColor3 = FromRGB(40, 40, 45),
+                BackgroundTransparency = 1,
                 ZIndex = 1001
             })
 
@@ -1384,6 +1372,7 @@
                 Text = Message or "Are you sure?",
                 Name = "\0",
                 BackgroundTransparency = 1,
+                TextTransparency = 1,
                 TextXAlignment = Enum.TextXAlignment.Center,
                 TextWrapped = true,
                 Position = UDim2New(0, 8, 0, 32),
@@ -1408,14 +1397,24 @@
                 Size = UDim2New(1, -16, 0, 24),
                 BorderSizePixel = 0,
                 ZIndex = 1001,
-                BackgroundColor3 = FromRGB(255, 255, 255)
+                BackgroundColor3 = FromRGB(18, 18, 23)
             })
 
             local function closeDialog()
                 pcall(function()
-                    Items["Dialog"]:Tween(nil, {Size = UDim2New(0, 260, 0, 0)})
-                    Items["Overlay"]:Tween(nil, {BackgroundTransparency = 1})
-                    task.wait(0.15)
+                    local tweenInfo = TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+                    TweenService:Create(Items["Overlay"].Instance, tweenInfo, {BackgroundTransparency = 1}):Play()
+                    TweenService:Create(Items["Dialog"].Instance, tweenInfo, {BackgroundTransparency = 1}):Play()
+                    for _, desc in Items["Dialog"].Instance:GetDescendants() do
+                        if desc:IsA("UIStroke") then
+                            TweenService:Create(desc, tweenInfo, {Transparency = 1}):Play()
+                        elseif desc:IsA("TextLabel") then
+                            TweenService:Create(desc, tweenInfo, {TextTransparency = 1}):Play()
+                        elseif desc:IsA("Frame") or desc:IsA("TextButton") then
+                            TweenService:Create(desc, tweenInfo, {BackgroundTransparency = 1}):Play()
+                        end
+                    end
+                    task.wait(0.2)
                     Items["Dialog"]:Clean()
                     Items["Overlay"]:Clean()
                 end)
@@ -1427,10 +1426,11 @@
                 Text = "",
                 AutoButtonColor = false,
                 Position = UDim2New(0, 0, 0, 0),
-                Size = UDim2New(0.48, 0, 1, 0),
+                Size = UDim2New(0.485, 0, 1, 0),
                 BorderColor3 = FromRGB(10, 10, 10),
                 BorderSizePixel = 2,
                 BackgroundColor3 = FromRGB(40, 65, 40),
+                BackgroundTransparency = 1,
                 ZIndex = 1002
             })
 
@@ -1455,6 +1455,7 @@
                 Text = "Yes",
                 Name = "\0",
                 BackgroundTransparency = 1,
+                TextTransparency = 1,
                 Size = UDim2New(1, 0, 1, 0),
                 Position = UDim2New(0, 0, 0, -1),
                 BorderSizePixel = 0,
@@ -1474,11 +1475,12 @@
                 Name = "\0",
                 Text = "",
                 AutoButtonColor = false,
-                Position = UDim2New(0.52, 0, 0, 0),
-                Size = UDim2New(0.48, 0, 1, 0),
+                Position = UDim2New(0.515, 0, 0, 0),
+                Size = UDim2New(0.485, 0, 1, 0),
                 BorderColor3 = FromRGB(10, 10, 10),
                 BorderSizePixel = 2,
                 BackgroundColor3 = FromRGB(65, 35, 35),
+                BackgroundTransparency = 1,
                 ZIndex = 1002
             })
 
@@ -1503,6 +1505,7 @@
                 Text = "No",
                 Name = "\0",
                 BackgroundTransparency = 1,
+                TextTransparency = 1,
                 Size = UDim2New(1, 0, 1, 0),
                 Position = UDim2New(0, 0, 0, -1),
                 BorderSizePixel = 0,
@@ -1544,33 +1547,28 @@
                 end
             end)
 
-            Items["Dialog"].Instance.BackgroundTransparency = 1
-            Items["Dialog"].Instance.Size = UDim2New(0, 260, 0, 0)
-            Items["Overlay"].Instance.BackgroundTransparency = 1
-
             for _, desc in Items["Dialog"].Instance:GetDescendants() do
                 if desc:IsA("UIStroke") then
                     desc.Transparency = 1
                 elseif desc:IsA("TextLabel") then
                     desc.TextTransparency = 1
-                elseif desc:IsA("Frame") then
+                elseif desc:IsA("Frame") or desc:IsA("TextButton") then
                     desc.BackgroundTransparency = 1
                 end
             end
 
             Library:Thread(function()
-                Items["Overlay"]:Tween(nil, {BackgroundTransparency = 0.5})
-                Items["Dialog"]:Tween(nil, {BackgroundTransparency = 0, Size = UDim2New(0, 260, 0, 110)})
-
-                task.wait(0.08)
-
+                local tweenInfo = TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+                TweenService:Create(Items["Overlay"].Instance, tweenInfo, {BackgroundTransparency = 0.5}):Play()
+                TweenService:Create(Items["Dialog"].Instance, tweenInfo, {BackgroundTransparency = 0}):Play()
                 for _, desc in Items["Dialog"].Instance:GetDescendants() do
+                    if desc == Items["ButtonContainer"].Instance then continue end
                     if desc:IsA("UIStroke") then
-                        desc.Transparency = 0
+                        TweenService:Create(desc, tweenInfo, {Transparency = 0}):Play()
                     elseif desc:IsA("TextLabel") then
-                        desc.TextTransparency = 0
-                    elseif desc:IsA("Frame") then
-                        desc.BackgroundTransparency = 0
+                        TweenService:Create(desc, tweenInfo, {TextTransparency = 0}):Play()
+                    elseif desc:IsA("Frame") or desc:IsA("TextButton") then
+                        TweenService:Create(desc, tweenInfo, {BackgroundTransparency = 0}):Play()
                     end
                 end
             end)
