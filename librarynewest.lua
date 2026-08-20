@@ -3630,7 +3630,9 @@
             return setmetatable(Section, Library.Sections)
         end
 
-        Library.Sections.Divider = function(self)
+        Library.Sections.Divider = function(self, Data)
+            Data = Data or { }
+
             local Divider = {
                 Window = self.Window,
                 Page = self.Page,
