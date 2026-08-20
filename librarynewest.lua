@@ -974,6 +974,54 @@
             Element:Refresh(List)
         end
 
+        Library.GetAutoloadConfig = function(self)
+            local autoloadPath = Library.Folders.Directory .. "/autoload.txt"
+            if isfile(autoloadPath) then
+                local ok, content = pcall(readfile, autoloadPath)
+                if ok and content and content ~= "" then
+                    return content
+                end
+            end
+            return nil
+        end
+
+        Library.SetAutoloadConfig = function(self, configName)
+            if not configName or configName == "" then return false end
+            local autoloadPath = Library.Folders.Directory .. "/autoload.txt"
+            local ok = pcall(writefile, autoloadPath, configName)
+            if ok then
+                Library:Notification("Autoload set to: " .. configName, 5, Color3.fromRGB(0, 255, 0))
+            end
+            return ok
+        end
+
+        Library.RemoveAutoloadConfig = function(self)
+            local autoloadPath = Library.Folders.Directory .. "/autoload.txt"
+            if isfile(autoloadPath) then
+                pcall(delfile, autoloadPath)
+            end
+            Library:Notification("Autoload config removed", 5, Color3.fromRGB(0, 255, 0))
+        end
+
+        Library.LoadAutoloadConfig = function(self)
+            local configName = Library:GetAutoloadConfig()
+            if not configName then return false end
+
+            local path = Library.Folders.Configs .. "/" .. configName
+            if not path:find("%.json$") then
+                path = path .. ".json"
+            end
+
+            if isfile(path) then
+                local ok, content = pcall(readfile, path)
+                if ok and content then
+                    Library:LoadConfig(content)
+                    return true
+                end
+            end
+            return false
+        end
+
         Library.ChangeItemTheme = function(self, Item, Properties)
             Item = Item.Instance or Item
 
